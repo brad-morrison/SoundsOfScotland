@@ -10,17 +10,9 @@ struct SoundscapeCard: View {
                 ZStack(alignment: .topTrailing) {
                     Image(soundscape.imageName)
                         .resizable()
-                        .scaledToFill()
-                        .frame(height: 190)
+                        .aspectRatio(16/9, contentMode: .fill)
                         .frame(maxWidth: .infinity)
                         .clipped()
-                        .background(
-                            LinearGradient(
-                                colors: [.blue.opacity(0.45), .purple.opacity(0.45)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
 
                     if soundscape.isPremium {
                         Image(systemName: "lock.fill")
@@ -34,13 +26,16 @@ struct SoundscapeCard: View {
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
+                    Text(soundscape.subtitle.uppercased())
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.white.opacity(0.7))
+                        .tracking(1)
+
                     Text(soundscape.title)
                         .font(.headline)
                         .foregroundStyle(.white)
-
-                    Text(soundscape.subtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.72))
+                        .lineLimit(2)
                 }
                 .padding(.horizontal, 14)
                 .padding(.bottom, 14)
@@ -61,3 +56,4 @@ struct SoundscapeCard: View {
         .padding()
         .background(Color(red: 0.05, green: 0.07, blue: 0.13))
 }
+

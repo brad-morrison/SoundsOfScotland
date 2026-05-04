@@ -138,7 +138,7 @@ struct HomeView: View {
                         SoundscapeCard(soundscape: soundscape) {
                             appState.select(soundscape)
                         }
-                        .frame(width: 185)
+                        .frame(width: 240)
                     }
                 }
                 .padding(.bottom, 4)

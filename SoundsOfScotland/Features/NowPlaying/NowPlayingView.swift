@@ -14,6 +14,14 @@ struct NowPlayingView: View {
                 emptyState
             }
         }
+        .gesture(
+            DragGesture(minimumDistance: 20)
+                .onEnded { value in
+                    if value.translation.height > 80 && abs(value.translation.width) < 100 {
+                        appState.closeNowPlaying()
+                    }
+                }
+        )
     }
 
     private func content(for soundscape: Soundscape) -> some View {
@@ -39,14 +47,12 @@ struct NowPlayingView: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    topBar(for: soundscape)
-
                     Spacer()
 
                     nowPlayingContent(for: soundscape)
                 }
                 .frame(width: proxy.size.width, height: proxy.size.height)
-                .padding(.top, 44)
+                .padding(.top, 0)
                 .zIndex(10)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
@@ -106,11 +112,42 @@ struct NowPlayingView: View {
                 .padding(.horizontal, 32)
                 .frame(maxWidth: .infinity)
 
-            playButton(for: soundscape)
-                .padding(.top, 18)
+            HStack(alignment: .center, spacing: 28) {
+                // Return (close) button
+                Button {
+                    appState.closeNowPlaying()
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(.black.opacity(0.45))
+                        .clipShape(Circle())
+                }
+
+                // Center play/pause button
+                playButton(for: soundscape)
+
+                // Star (favourite) button
+                Button {
+                    appState.toggleFavourite(soundscape)
+                } label: {
+                    Image(systemName: appState.isFavourite(soundscape) ? "star.fill" : "star")
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(.black.opacity(0.45))
+                        .clipShape(Circle())
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .multilineTextAlignment(.center)
+            .padding(.top, 22)
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 28)
+        .padding(.bottom, 20)
+        .padding(.bottom, safeAreaBottomPadding())
     }
 
     private func playButton(for soundscape: Soundscape) -> some View {
@@ -146,6 +183,14 @@ struct NowPlayingView: View {
         .foregroundStyle(.white)
         .multilineTextAlignment(.center)
         .padding()
+    }
+
+    private func safeAreaBottomPadding() -> CGFloat {
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first {
+            return max(window.safeAreaInsets.bottom, 0)
+        }
+        return 0
     }
 }
 
