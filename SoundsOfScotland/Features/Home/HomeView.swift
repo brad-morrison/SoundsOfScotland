@@ -28,6 +28,11 @@ struct HomeView: View {
                     VStack(alignment: .leading, spacing: 28) {
                         header
 
+                        Text(appState.isAuthPresented ? "Auth sheet: PRESENTED" : "Auth sheet: NOT presented")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 20)
+
                         featuredSection
 
                         recentSection
@@ -44,6 +49,20 @@ struct HomeView: View {
             }
             .sheet(isPresented: $isSettingsPresented) {
                 SettingsView()
+                    .environmentObject(appState)
+            }
+            .sheet(isPresented: Binding(
+                get: { appState.isAuthPresented },
+                set: { appState.isAuthPresented = $0 }
+            )) {
+                AuthView()
+                    .environmentObject(appState)
+            }
+            .sheet(isPresented: Binding(
+                get: { appState.isProfilePresented },
+                set: { appState.isProfilePresented = $0 }
+            )) {
+                ProfileView()
                     .environmentObject(appState)
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -110,9 +129,14 @@ struct HomeView: View {
                 .buttonStyle(.plain)
 
                 Button {
-                    // Profile will come later.
+                    print("HomeView: Profile button tapped")
+                    if appState.isAuthenticated {
+                        appState.isProfilePresented = true
+                    } else {
+                        appState.isAuthPresented = true
+                    }
                 } label: {
-                    Image(systemName: "person.crop.circle")
+                    Image(systemName: appState.isAuthenticated ? "person.crop.circle.fill" : "person.crop.circle")
                         .font(.title3)
                         .foregroundStyle(isDarkMode ? .white : .black)
                         .frame(width: 42, height: 42)

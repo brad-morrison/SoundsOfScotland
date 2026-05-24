@@ -1,15 +1,21 @@
 import Foundation
 import Combine
+import AuthenticationServices
 
 @MainActor
 final class AppState: ObservableObject {
     @Published var selectedSoundscape: Soundscape?
     @Published var isNowPlayingPresented = false
+    @Published var isProfilePresented = false
     @Published private(set) var favouriteSoundscapeIDs: Set<String> = [] {
         didSet {
             saveFavouriteSoundscapeIDs()
         }
     }
+    @Published var isAuthPresented = false
+    @Published private(set) var currentUser: AuthenticatedUser? = AuthService.shared.currentUser
+
+    var isAuthenticated: Bool { currentUser != nil }
 
     let audioPlayer = AudioPlayerService()
 
@@ -24,6 +30,10 @@ final class AppState: ObservableObject {
                 self?.objectWillChange.send()
             }
             .store(in: &cancellables)
+
+        NotificationCenter.default.addObserver(forName: .authStateChanged, object: nil, queue: .main) { [weak self] _ in
+            self?.currentUser = AuthService.shared.currentUser
+        }
     }
 
     func select(_ soundscape: Soundscape) {
