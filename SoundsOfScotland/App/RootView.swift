@@ -2,28 +2,27 @@ import SwiftUI
 
 struct RootView: View {
     @EnvironmentObject private var appState: AppState
+    @State private var selectedTab = AppTab.home
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             HomeView()
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
+                .tag(AppTab.home)
 
             StarredView()
                 .tabItem {
                     Label("Starred", systemImage: "star.fill")
                 }
+                .tag(AppTab.starred)
 
             MapView()
                 .tabItem {
                     Label("Map", systemImage: "map.fill")
                 }
-
-            NowPlayingView()
-                .tabItem {
-                    Label("Playing", systemImage: "play.circle.fill")
-                }
+                .tag(AppTab.map)
         }
         .safeAreaInset(edge: .bottom) {
             if !appState.isNowPlayingPresented {
@@ -38,6 +37,12 @@ struct RootView: View {
                 .environmentObject(appState)
         }
     }
+}
+
+private enum AppTab {
+    case home
+    case starred
+    case map
 }
 
 #Preview {

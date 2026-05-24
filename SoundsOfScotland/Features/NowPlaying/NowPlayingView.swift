@@ -38,14 +38,14 @@ struct NowPlayingView: View {
                 LinearGradient(
                     colors: isDarkMode
                         ? [
-                            .black.opacity(0.2),
-                            .black.opacity(0.45),
-                            .black.opacity(0.9)
+                            .black.opacity(0.18),
+                            .black.opacity(0.32),
+                            .black.opacity(0.84)
                         ]
                         : [
-                            .white.opacity(0.2),
-                            .white.opacity(0.4),
-                            .white.opacity(0.7)
+                            .white.opacity(0.1),
+                            .white.opacity(0.28),
+                            .white.opacity(0.78)
                         ],
                     startPoint: .top,
                     endPoint: .bottom
@@ -53,13 +53,8 @@ struct NowPlayingView: View {
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    Spacer()
-
-                    nowPlayingContent(for: soundscape)
-                }
+                nowPlayingContent(for: soundscape)
                 .frame(width: proxy.size.width, height: proxy.size.height)
-                .padding(.top, 0)
                 .zIndex(10)
             }
             .frame(width: proxy.size.width, height: proxy.size.height)
@@ -67,94 +62,58 @@ struct NowPlayingView: View {
         .ignoresSafeArea()
     }
 
-    private func topBar(for soundscape: Soundscape) -> some View {
-        HStack {
-            Button {
-                appState.closeNowPlaying()
-            } label: {
-                Image(systemName: "chevron.down")
-                    .font(.headline)
-                    .foregroundStyle(isDarkMode ? .white : .black)
-                    .frame(width: 48, height: 48)
-                    .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
-                    .clipShape(Circle())
-            }
-
-            Spacer()
-
-            Button {
-                appState.toggleFavourite(soundscape)
-            } label: {
-                Image(systemName: appState.isFavourite(soundscape) ? "star.fill" : "star")
-                    .font(.headline)
-                    .foregroundStyle(isDarkMode ? .white : .black)
-                    .frame(width: 48, height: 48)
-                    .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
-                    .clipShape(Circle())
-            }
-        }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity)
-    }
-
     private func nowPlayingContent(for soundscape: Soundscape) -> some View {
-        VStack(spacing: 14) {
-            Text(soundscape.subtitle.uppercased())
-                .font(.caption)
-                .fontWeight(.bold)
-                .tracking(2)
-                .foregroundStyle(isDarkMode ? .white.opacity(0.7) : .black.opacity(0.7))
+        GeometryReader { proxy in
+            let topPadding = proxy.safeAreaInsets.top + 96
+            let bottomPadding = max(proxy.safeAreaInsets.bottom, 16) + 52
 
-            Text(soundscape.title)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(isDarkMode ? .white : .black)
+            VStack(spacing: 0) {
+                VStack(spacing: 14) {
+                    Text(soundscape.subtitle.uppercased())
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .tracking(2)
+                        .foregroundStyle(isDarkMode ? .white.opacity(0.7) : .black.opacity(0.7))
 
-            Text(soundscape.description)
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(isDarkMode ? .white.opacity(0.75) : .black.opacity(0.75))
+                    Text(soundscape.title)
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(isDarkMode ? .white : .black)
+
+                    Text(soundscape.description)
+                        .font(.body)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(isDarkMode ? .white.opacity(0.75) : .black.opacity(0.75))
+                        .padding(.horizontal, 32)
+                        .frame(maxWidth: .infinity)
+                }
                 .padding(.horizontal, 32)
+                .padding(.top, topPadding)
+
+                Spacer(minLength: 24)
+
+                HStack(alignment: .center, spacing: 28) {
+                    Button {
+                        appState.closeNowPlaying()
+                    } label: {
+                        controlIcon("chevron.down")
+                    }
+
+                    playButton(for: soundscape)
+
+                    Button {
+                        appState.toggleFavourite(soundscape)
+                    } label: {
+                        controlIcon(appState.isFavourite(soundscape) ? "star.fill" : "star")
+                    }
+                }
                 .frame(maxWidth: .infinity)
-
-            HStack(alignment: .center, spacing: 28) {
-                // Return (close) button
-                Button {
-                    appState.closeNowPlaying()
-                } label: {
-                    Image(systemName: "chevron.down")
-                        .font(.headline)
-                        .foregroundStyle(isDarkMode ? .white : .black)
-                        .frame(width: 48, height: 48)
-                        .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
-                        .clipShape(Circle())
-                }
-
-                // Center play/pause button
-                playButton(for: soundscape)
-
-                // Star (favourite) button
-                Button {
-                    appState.toggleFavourite(soundscape)
-                } label: {
-                    Image(systemName: appState.isFavourite(soundscape) ? "star.fill" : "star")
-                        .font(.headline)
-                        .foregroundStyle(isDarkMode ? .white : .black)
-                        .frame(width: 48, height: 48)
-                        .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
-                        .clipShape(Circle())
-                }
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+                .padding(.bottom, bottomPadding)
             }
-            .frame(maxWidth: .infinity)
-            .multilineTextAlignment(.center)
-            .padding(.top, 22)
         }
-        .padding(.horizontal, 20)
-        .padding(.bottom, 28)
-        .padding(.bottom, 20)
-        .padding(.bottom, safeAreaBottomPadding())
     }
 
     private func playButton(for soundscape: Soundscape) -> some View {
@@ -170,9 +129,18 @@ struct NowPlayingView: View {
                 .frame(width: 78, height: 78)
                 .background(isDarkMode ? Color.white : Color.white)
                 .clipShape(Circle())
-                .shadow(radius: 20)
+                .shadow(color: .black.opacity(0.28), radius: 22, x: 0, y: 10)
         }
         .buttonStyle(.plain)
+    }
+
+    private func controlIcon(_ systemName: String) -> some View {
+        Image(systemName: systemName)
+            .font(.headline)
+            .foregroundStyle(isDarkMode ? .white : .black)
+            .frame(width: 52, height: 52)
+            .background(isDarkMode ? Color.black.opacity(0.36) : Color.white.opacity(0.55))
+            .clipShape(Circle())
     }
 
     private var emptyState: some View {
@@ -190,14 +158,6 @@ struct NowPlayingView: View {
         .foregroundStyle(isDarkMode ? .white : .black)
         .multilineTextAlignment(.center)
         .padding()
-    }
-
-    private func safeAreaBottomPadding() -> CGFloat {
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let window = windowScene.windows.first {
-            return max(window.safeAreaInsets.bottom, 0)
-        }
-        return 0
     }
 }
 
