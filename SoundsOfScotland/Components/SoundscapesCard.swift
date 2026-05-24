@@ -3,6 +3,8 @@ import SwiftUI
 struct SoundscapeCard: View {
     let soundscape: Soundscape
     let action: () -> Void
+    
+    @AppStorage("isDarkMode") private var isDarkMode = false
 
     var body: some View {
         Button(action: action) {
@@ -29,22 +31,22 @@ struct SoundscapeCard: View {
                     Text(soundscape.subtitle.uppercased())
                         .font(.caption2)
                         .fontWeight(.bold)
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(isDarkMode ? .white.opacity(0.7) : .black.opacity(0.7))
                         .tracking(1)
 
                     Text(soundscape.title)
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(isDarkMode ? .white : .black)
                         .lineLimit(2)
                 }
                 .padding(.horizontal, 14)
                 .padding(.bottom, 14)
             }
-            .background(Color.white.opacity(0.08))
+            .background(isDarkMode ? Color.white.opacity(0.08) : Color.black.opacity(0.06))
             .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
             .overlay(
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(.white.opacity(0.08), lineWidth: 1)
+                    .stroke(isDarkMode ? Color.white.opacity(0.08) : Color.black.opacity(0.12), lineWidth: 1)
             )
         }
         .buttonStyle(.plain)

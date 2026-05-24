@@ -1,11 +1,12 @@
 import SwiftUI
 
 struct NowPlayingView: View {
+    @AppStorage("isDarkMode") private var isDarkMode = false
     @EnvironmentObject private var appState: AppState
 
     var body: some View {
         ZStack {
-            Color(red: 0.04, green: 0.06, blue: 0.12)
+            (isDarkMode ? Color(red: 0.04, green: 0.06, blue: 0.12) : Color(red: 0.98, green: 0.97, blue: 0.94))
                 .ignoresSafeArea()
 
             if let soundscape = appState.selectedSoundscape {
@@ -35,11 +36,17 @@ struct NowPlayingView: View {
                     .ignoresSafeArea()
 
                 LinearGradient(
-                    colors: [
-                        .black.opacity(0.2),
-                        .black.opacity(0.45),
-                        .black.opacity(0.9)
-                    ],
+                    colors: isDarkMode
+                        ? [
+                            .black.opacity(0.2),
+                            .black.opacity(0.45),
+                            .black.opacity(0.9)
+                        ]
+                        : [
+                            .white.opacity(0.2),
+                            .white.opacity(0.4),
+                            .white.opacity(0.7)
+                        ],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -67,9 +74,9 @@ struct NowPlayingView: View {
             } label: {
                 Image(systemName: "chevron.down")
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(isDarkMode ? .white : .black)
                     .frame(width: 48, height: 48)
-                    .background(.black.opacity(0.45))
+                    .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
                     .clipShape(Circle())
             }
 
@@ -80,9 +87,9 @@ struct NowPlayingView: View {
             } label: {
                 Image(systemName: appState.isFavourite(soundscape) ? "star.fill" : "star")
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(isDarkMode ? .white : .black)
                     .frame(width: 48, height: 48)
-                    .background(.black.opacity(0.45))
+                    .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
                     .clipShape(Circle())
             }
         }
@@ -97,18 +104,18 @@ struct NowPlayingView: View {
                 .font(.caption)
                 .fontWeight(.bold)
                 .tracking(2)
-                .foregroundStyle(.white.opacity(0.7))
+                .foregroundStyle(isDarkMode ? .white.opacity(0.7) : .black.opacity(0.7))
 
             Text(soundscape.title)
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.white)
+                .foregroundStyle(isDarkMode ? .white : .black)
 
             Text(soundscape.description)
                 .font(.body)
                 .multilineTextAlignment(.center)
-                .foregroundStyle(.white.opacity(0.75))
+                .foregroundStyle(isDarkMode ? .white.opacity(0.75) : .black.opacity(0.75))
                 .padding(.horizontal, 32)
                 .frame(maxWidth: .infinity)
 
@@ -119,9 +126,9 @@ struct NowPlayingView: View {
                 } label: {
                     Image(systemName: "chevron.down")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(isDarkMode ? .white : .black)
                         .frame(width: 48, height: 48)
-                        .background(.black.opacity(0.45))
+                        .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
                         .clipShape(Circle())
                 }
 
@@ -134,9 +141,9 @@ struct NowPlayingView: View {
                 } label: {
                     Image(systemName: appState.isFavourite(soundscape) ? "star.fill" : "star")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(isDarkMode ? .white : .black)
                         .frame(width: 48, height: 48)
-                        .background(.black.opacity(0.45))
+                        .background(isDarkMode ? Color.black.opacity(0.45) : Color.white.opacity(0.45))
                         .clipShape(Circle())
                 }
             }
@@ -159,9 +166,9 @@ struct NowPlayingView: View {
         } label: {
             Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                 .font(.title)
-                .foregroundStyle(.black)
+                .foregroundStyle(isDarkMode ? .black : .black)
                 .frame(width: 78, height: 78)
-                .background(.white)
+                .background(isDarkMode ? Color.white : Color.white)
                 .clipShape(Circle())
                 .shadow(radius: 20)
         }
@@ -178,9 +185,9 @@ struct NowPlayingView: View {
 
             Text("Choose a soundscape from Home to begin.")
                 .font(.body)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(isDarkMode ? .white.opacity(0.7) : .black.opacity(0.7))
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(isDarkMode ? .white : .black)
         .multilineTextAlignment(.center)
         .padding()
     }

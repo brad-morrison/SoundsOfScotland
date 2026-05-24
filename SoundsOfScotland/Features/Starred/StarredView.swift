@@ -2,6 +2,7 @@ import SwiftUI
 
 struct StarredView: View {
     @EnvironmentObject private var appState: AppState
+    @AppStorage("isDarkMode") private var isDarkMode = false
 
     private var favouriteSoundscapes: [Soundscape] {
         MockSoundscapes.all.filter { soundscape in
@@ -12,7 +13,7 @@ struct StarredView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color(red: 0.04, green: 0.06, blue: 0.12)
+                (isDarkMode ? Color(red: 0.04, green: 0.06, blue: 0.12) : Color(red: 0.98, green: 0.97, blue: 0.94))
                     .ignoresSafeArea()
 
                 if favouriteSoundscapes.isEmpty {
@@ -45,9 +46,9 @@ struct StarredView: View {
 
             Text("Star a soundscape and it will appear here.")
                 .font(.body)
-                .foregroundStyle(.white.opacity(0.65))
+                .foregroundStyle(isDarkMode ? Color.white.opacity(0.65) : Color.black.opacity(0.65))
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(isDarkMode ? Color.white : Color.black)
         .multilineTextAlignment(.center)
         .padding()
     }

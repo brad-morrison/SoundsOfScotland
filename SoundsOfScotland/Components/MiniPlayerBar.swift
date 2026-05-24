@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MiniPlayerBar: View {
     @EnvironmentObject private var appState: AppState
+    @AppStorage("isDarkMode") private var isDarkMode = false
 
     var body: some View {
         if let soundscape = appState.audioPlayer.currentSoundscape {
@@ -20,12 +21,12 @@ struct MiniPlayerBar: View {
                         Text("Now Playing")
                             .font(.caption)
                             .fontWeight(.semibold)
-                            .foregroundStyle(.white.opacity(0.58))
+                            .foregroundStyle(isDarkMode ? .white.opacity(0.58) : .black.opacity(0.58))
 
                         Text(soundscape.title)
                             .font(.subheadline)
                             .fontWeight(.semibold)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(isDarkMode ? .white : .black)
                             .lineLimit(1)
                     }
 
@@ -36,15 +37,16 @@ struct MiniPlayerBar: View {
                     } label: {
                         Image(systemName: appState.audioPlayer.isPlaying ? "pause.fill" : "play.fill")
                             .font(.headline)
-                            .foregroundStyle(.black)
+                            .foregroundStyle(isDarkMode ? .black : .white)
                             .frame(width: 42, height: 42)
-                            .background(.white)
+                            .background(isDarkMode ? Color.white : Color.black)
                             .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
                 }
                 .padding(10)
-                .background(.ultraThinMaterial.opacity(0.92))
+                .background(isDarkMode ? AnyShapeStyle(.ultraThinMaterial) : AnyShapeStyle(Color.white.opacity(0.85)))
+                .opacity(isDarkMode ? 0.92 : 1.0)
                 .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
                 .overlay {
                     RoundedRectangle(cornerRadius: 26, style: .continuous)
@@ -76,3 +78,4 @@ struct MiniPlayerBar: View {
         }
     }
 }
+
