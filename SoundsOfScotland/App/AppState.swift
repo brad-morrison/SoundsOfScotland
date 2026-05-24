@@ -20,7 +20,11 @@ final class AppState: ObservableObject {
     let audioPlayer = AudioPlayerService()
 
     private var cancellables = Set<AnyCancellable>()
-    private let favouritesKey = "favouriteSoundscapeIDs"
+    private let legacyFavouritesKey = "favouriteSoundscapeIDs"
+    private var currentUserFavouritesKey: String? {
+        guard let userID = currentUser?.id else { return nil }
+        return "\(legacyFavouritesKey).\(userID)"
+    }
 
     init() {
         favouriteSoundscapeIDs = loadFavouriteSoundscapeIDs()
@@ -32,7 +36,10 @@ final class AppState: ObservableObject {
             .store(in: &cancellables)
 
         NotificationCenter.default.addObserver(forName: .authStateChanged, object: nil, queue: .main) { [weak self] _ in
-            self?.currentUser = AuthService.shared.currentUser
+            guard let self else { return }
+
+            currentUser = AuthService.shared.currentUser
+            favouriteSoundscapeIDs = loadFavouriteSoundscapeIDs()
         }
     }
 
@@ -51,6 +58,12 @@ final class AppState: ObservableObject {
     }
 
     func toggleFavourite(_ soundscape: Soundscape) {
+        guard isAuthenticated else {
+            favouriteSoundscapeIDs = []
+            isAuthPresented = true
+            return
+        }
+
         if favouriteSoundscapeIDs.contains(soundscape.id) {
             favouriteSoundscapeIDs.remove(soundscape.id)
         } else {
@@ -59,12 +72,26 @@ final class AppState: ObservableObject {
     }
 
     private func saveFavouriteSoundscapeIDs() {
+        guard let favouritesKey = currentUserFavouritesKey else { return }
+
         let ids = Array(favouriteSoundscapeIDs)
         UserDefaults.standard.set(ids, forKey: favouritesKey)
     }
 
     private func loadFavouriteSoundscapeIDs() -> Set<String> {
-        let ids = UserDefaults.standard.stringArray(forKey: favouritesKey) ?? []
+        guard let favouritesKey = currentUserFavouritesKey else { return [] }
+
+        if let ids = UserDefaults.standard.stringArray(forKey: favouritesKey) {
+            return Set(ids)
+        }
+
+        if let legacyIDs = UserDefaults.standard.stringArray(forKey: legacyFavouritesKey) {
+            UserDefaults.standard.set(legacyIDs, forKey: favouritesKey)
+            UserDefaults.standard.removeObject(forKey: legacyFavouritesKey)
+            return Set(legacyIDs)
+        }
+
+        let ids: [String] = []
         return Set(ids)
     }
 }
