@@ -33,7 +33,7 @@ struct RootView: View {
         }
         .animation(.spring(response: 0.35, dampingFraction: 0.85), value: appState.audioPlayer.currentSoundscape)
         .fullScreenCover(isPresented: $appState.isNowPlayingPresented) {
-            NowPlayingView()
+            NowPlayingViewNew()
                 .environmentObject(appState)
         }
     }
